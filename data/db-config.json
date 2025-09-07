@@ -1,0 +1,8 @@
+{
+    "type": "sqlite",
+    "port": 3306,
+    "hostname": "",
+    "username": "coosef13@gmail.com",
+    "password": "12345352Zc",
+    "dbName": "kuma"
+}

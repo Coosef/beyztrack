@@ -1,0 +1,41 @@
+<svg width="640" height="640" viewBox="0 0 640 640" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1e3a8a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background circle -->
+  <circle cx="320" cy="320" r="300" fill="url(#bg)" stroke="#ffffff" stroke-width="4"/>
+  
+  <!-- BS Letters -->
+  <text x="320" y="380" font-family="Arial, sans-serif" font-size="120" font-weight="bold" text-anchor="middle" fill="#ffffff">BS</text>
+  
+  <!-- Network nodes around BS -->
+  <g stroke="#ffffff" stroke-width="3" fill="none">
+    <!-- Top nodes -->
+    <circle cx="200" cy="200" r="8" fill="#ffffff"/>
+    <circle cx="440" cy="200" r="8" fill="#ffffff"/>
+    <circle cx="320" cy="150" r="8" fill="#ffffff"/>
+    
+    <!-- Bottom nodes -->
+    <circle cx="200" cy="440" r="8" fill="#ffffff"/>
+    <circle cx="440" cy="440" r="8" fill="#ffffff"/>
+    <circle cx="320" cy="490" r="8" fill="#ffffff"/>
+    
+    <!-- Side nodes -->
+    <circle cx="150" cy="320" r="8" fill="#ffffff"/>
+    <circle cx="490" cy="320" r="8" fill="#ffffff"/>
+    
+    <!-- Connection lines -->
+    <line x1="200" y1="200" x2="320" y2="150"/>
+    <line x1="440" y1="200" x2="320" y2="150"/>
+    <line x1="200" y1="440" x2="320" y2="490"/>
+    <line x1="440" y1="440" x2="320" y2="490"/>
+    <line x1="150" y1="320" x2="200" y2="200"/>
+    <line x1="490" y1="320" x2="440" y2="200"/>
+    <line x1="150" y1="320" x2="200" y2="440"/>
+    <line x1="490" y1="320" x2="440" y2="440"/>
+  </g>
+</svg>

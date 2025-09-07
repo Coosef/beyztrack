@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  beyztrack:
+    build: .
+    container_name: beyztrack
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+    networks:
+      - beyztrack-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/api/status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  nginx:
+    image: nginx:alpine
+    container_name: beyztrack-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./ssl:/etc/nginx/ssl
+    depends_on:
+      - beyztrack
+    networks:
+      - beyztrack-network
+
+networks:
+  beyztrack-network:
+    driver: bridge
+
+volumes:
+  data:
+  logs:
