@@ -9,7 +9,8 @@ set -e
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
+BLUE='\033[1;34m'  # Bright Blue (daha görünür)
+CYAN='\033[0;36m'  # Cyan (lacivert yerine)
 NC='\033[0m' # No Color
 
 # Logo
@@ -40,7 +41,7 @@ success() {
 
 # Bilgi mesajı
 info() {
-    echo -e "${BLUE}ℹ️  $1${NC}"
+    echo -e "${CYAN}ℹ️  $1${NC}"
 }
 
 # Uyarı mesajı
