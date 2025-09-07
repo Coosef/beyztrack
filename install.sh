@@ -287,9 +287,9 @@ install_beyztrack() {
     cd $INSTALL_DIR
     
     if [[ $EUID -eq 0 ]]; then
-        npm install --production
+        npm install --production --legacy-peer-deps
     else
-        sudo npm install --production
+        sudo npm install --production --legacy-peer-deps
     fi
     
     # Geçici dosyaları temizle
