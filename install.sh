@@ -248,7 +248,25 @@ install_beyztrack() {
     # Proje dosyalarını kopyala
     info "Proje dosyaları kopyalanıyor..."
     
-    # Mevcut dizinden kopyala
+    # GitHub'dan projeyi indir
+    info "GitHub'dan proje indiriliyor..."
+    cd /tmp
+    if [[ -d "beyztrack" ]]; then
+        rm -rf beyztrack
+    fi
+    
+    git clone https://github.com/Coosef/beyztrack.git
+    cd beyztrack
+    
+    # NPM bağımlılıklarını kur
+    info "Bağımlılıklar kuruluyor..."
+    npm install
+    
+    # Projeyi build et
+    info "Proje build ediliyor..."
+    npm run build
+    
+    # Build dosyalarını kurulum dizinine kopyala
     if [[ -d "dist" ]]; then
         if [[ $EUID -eq 0 ]]; then
             cp -r dist/* $INSTALL_DIR/
@@ -260,11 +278,11 @@ install_beyztrack() {
             sudo cp server.js $INSTALL_DIR/ 2>/dev/null || true
         fi
     else
-        error "Build dosyaları bulunamadı. Önce 'npm run build' çalıştırın"
+        error "Build başarısız oldu"
     fi
     
-    # NPM bağımlılıklarını kur
-    info "Bağımlılıklar kuruluyor..."
+    # Production bağımlılıklarını kur
+    info "Production bağımlılıkları kuruluyor..."
     cd $INSTALL_DIR
     
     if [[ $EUID -eq 0 ]]; then
@@ -272,6 +290,10 @@ install_beyztrack() {
     else
         sudo npm install --production
     fi
+    
+    # Geçici dosyaları temizle
+    cd /tmp
+    rm -rf beyztrack
     
     success "BeyzTrack kuruldu: $INSTALL_DIR"
 }
