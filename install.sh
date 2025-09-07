@@ -299,57 +299,49 @@ install_beyztrack() {
     success "BeyzTrack kuruldu: $INSTALL_DIR"
 }
 
-# PM2 konfigürasyonu
+# PM2 konfigürasyonu (Frontend için gerekli değil)
 configure_pm2() {
     info "PM2 konfigürasyonu..."
     
-    INSTALL_DIR="/opt/beyztrack"
-    
-    # PM2 ecosystem dosyası oluştur
-    cat > /tmp/beyztrack.config.js << EOF
-module.exports = {
-  apps: [{
-    name: 'beyztrack',
-    script: 'server.js',
-    cwd: '$INSTALL_DIR',
-    instances: 1,
-    autorestart: true,
-    watch: false,
-    max_memory_restart: '1G',
-    env: {
-      NODE_ENV: 'production',
-      PORT: 3001
-    }
-  }]
-};
-EOF
-    
-    if [[ $EUID -eq 0 ]]; then
-        mv /tmp/beyztrack.config.js $INSTALL_DIR/
-        pm2 start $INSTALL_DIR/beyztrack.config.js
-        pm2 save
-        pm2 startup
-    else
-        sudo mv /tmp/beyztrack.config.js $INSTALL_DIR/
-        pm2 start $INSTALL_DIR/beyztrack.config.js
-        pm2 save
-        sudo pm2 startup
-    fi
-    
-    success "PM2 konfigüre edildi"
+    # Frontend Vue.js uygulaması için PM2 gerekli değil
+    # Nginx ile static dosyalar serve edilecek
+    info "Frontend uygulaması için PM2 gerekli değil"
+    success "PM2 konfigürasyonu atlandı (Frontend uygulaması)"
 }
 
 # Nginx konfigürasyonu
 configure_nginx() {
     info "Nginx konfigürasyonu..."
     
-    # Nginx config dosyası oluştur
+    INSTALL_DIR="/opt/beyztrack"
+    
+    # Nginx config dosyası oluştur (Frontend için)
     cat > /tmp/beyztrack << EOF
 server {
     listen 80;
     server_name _;
+    root $INSTALL_DIR;
+    index index.html;
     
+    # Gzip sıkıştırma
+    gzip on;
+    gzip_vary on;
+    gzip_min_length 1024;
+    gzip_types text/plain text/css text/xml text/javascript application/javascript application/xml+rss application/json;
+    
+    # Static dosyalar için cache
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+    
+    # Vue.js router için
     location / {
+        try_files \$uri \$uri/ /index.html;
+    }
+    
+    # API proxy (gelecekte backend eklenirse)
+    location /api/ {
         proxy_pass http://localhost:3001;
         proxy_http_version 1.1;
         proxy_set_header Upgrade \$http_upgrade;
