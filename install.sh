@@ -232,6 +232,60 @@ configure_firewall() {
     fi
 }
 
+# Mevcut kurulum kontrolü
+check_existing_installation() {
+    info "Mevcut kurulum kontrol ediliyor..."
+    
+    INSTALL_DIR="/opt/beyztrack"
+    
+    if [[ -d "$INSTALL_DIR" ]] && [[ -f "$INSTALL_DIR/package.json" ]]; then
+        warning "Mevcut BeyzTrack kurulumu bulundu!"
+        echo ""
+        echo -e "${YELLOW}Seçenekler:${NC}"
+        echo -e "  1) Mevcut kurulumu sil ve sıfırdan kur"
+        echo -e "  2) Mevcut kurulumun üzerine güncelle"
+        echo -e "  3) Kurulumu iptal et"
+        echo ""
+        read -p "Seçiminizi yapın (1-3): " choice
+        
+        case $choice in
+            1)
+                info "Mevcut kurulum siliniyor..."
+                # PM2 process'leri durdur
+                pm2 stop beyztrack 2>/dev/null || true
+                pm2 delete beyztrack 2>/dev/null || true
+                
+                # Eski dosyaları sil
+                if [[ $EUID -eq 0 ]]; then
+                    rm -rf $INSTALL_DIR
+                    rm -rf /root/.uptime-kuma 2>/dev/null || true
+                    rm -rf /home/*/.uptime-kuma 2>/dev/null || true
+                else
+                    sudo rm -rf $INSTALL_DIR
+                    sudo rm -rf /root/.uptime-kuma 2>/dev/null || true
+                    sudo rm -rf /home/*/.uptime-kuma 2>/dev/null || true
+                fi
+                success "Mevcut kurulum silindi"
+                FRESH_INSTALL=true
+                ;;
+            2)
+                info "Mevcut kurulumun üzerine güncelleme yapılacak"
+                FRESH_INSTALL=false
+                ;;
+            3)
+                info "Kurulum iptal edildi"
+                exit 0
+                ;;
+            *)
+                error "Geçersiz seçim"
+                ;;
+        esac
+    else
+        info "Mevcut kurulum bulunamadı, sıfırdan kurulum yapılacak"
+        FRESH_INSTALL=true
+    fi
+}
+
 # BeyzTrack kurulumu
 install_beyztrack() {
     info "BeyzTrack kurulumu başlatılıyor..."
@@ -306,16 +360,20 @@ install_beyztrack() {
         sudo npm install --production --legacy-peer-deps
     fi
     
-    # Eski veritabanı dosyalarını temizle (sıfırdan kurulum için)
-    info "Eski veritabanı dosyaları temizleniyor..."
-    if [[ $EUID -eq 0 ]]; then
-        rm -rf /root/.uptime-kuma 2>/dev/null || true
-        rm -rf /home/*/.uptime-kuma 2>/dev/null || true
+    # Sıfırdan kurulum için veritabanı dosyalarını temizle
+    if [[ "$FRESH_INSTALL" == "true" ]]; then
+        info "Sıfırdan kurulum için veritabanı dosyaları temizleniyor..."
+        if [[ $EUID -eq 0 ]]; then
+            rm -rf /root/.uptime-kuma 2>/dev/null || true
+            rm -rf /home/*/.uptime-kuma 2>/dev/null || true
+        else
+            sudo rm -rf /root/.uptime-kuma 2>/dev/null || true
+            sudo rm -rf /home/*/.uptime-kuma 2>/dev/null || true
+        fi
+        success "Veritabanı dosyaları temizlendi (sıfırdan kurulum)"
     else
-        sudo rm -rf /root/.uptime-kuma 2>/dev/null || true
-        sudo rm -rf /home/*/.uptime-kuma 2>/dev/null || true
+        info "Mevcut kurulumun üzerine güncelleme yapılıyor"
     fi
-    success "Eski veritabanı dosyaları temizlendi"
     
     # Geçici dosyaları temizle
     cd /tmp
@@ -504,6 +562,7 @@ main() {
     install_pm2
     install_nginx
     configure_firewall
+    check_existing_installation
     install_beyztrack
     configure_pm2
     configure_nginx
