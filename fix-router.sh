@@ -63,6 +63,10 @@ fix_router() {
         info "Mevcut router.js içeriği kontrol ediliyor..."
         sudo head -20 "$router_file"
         
+        # Dosyayı sil ve yeniden oluştur
+        info "Router.js dosyası siliniyor..."
+        sudo rm -f "$router_file"
+        
         # Router dosyasını tamamen yeniden yaz
         info "Router.js tamamen yeniden yazılıyor..."
         sudo tee "$router_file" > /dev/null << 'EOF'
@@ -137,6 +141,17 @@ EOF
         # Dosyanın gerçekten değiştiğini kontrol et
         info "Router.js güncellenmiş içeriği kontrol ediliyor..."
         sudo head -10 "$router_file"
+        
+        # Dosya boyutunu kontrol et
+        info "Router.js dosya boyutu: $(sudo wc -l < "$router_file") satır"
+        
+        # SetupDatabase import'unun olmadığını kontrol et
+        if sudo grep -q "SetupDatabase" "$router_file"; then
+            error "SetupDatabase hala mevcut!"
+            sudo grep -n "SetupDatabase" "$router_file"
+        else
+            success "SetupDatabase import'u başarıyla kaldırıldı"
+        fi
         
     else
         error "Router.js bulunamadı!"
