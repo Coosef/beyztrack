@@ -58,6 +58,12 @@ check_system() {
         error "Bu script sadece Linux sistemlerde çalışır"
     fi
     
+    # Cloud Shell kontrolü
+    if [[ -n "$CLOUD_SHELL" ]] || [[ -n "$GOOGLE_CLOUD_PROJECT" ]]; then
+        warning "Google Cloud Shell'de çalıştırıyorsunuz. Kurulum geçici olacaktır."
+        warning "Kalıcı kurulum için VM kullanmanız önerilir."
+    fi
+    
     # Root kontrolü
     if [[ $EUID -eq 0 ]]; then
         warning "Root olarak çalıştırıyorsunuz. Güvenlik için normal kullanıcı ile çalıştırmanız önerilir."
@@ -111,8 +117,9 @@ install_nodejs() {
         info "Node.js zaten kurulu: $NODE_VERSION"
         
         # Minimum versiyon kontrolü
-        REQUIRED_VERSION="16.0.0"
-        if ! node -e "process.exit(require('semver').gte(process.version.slice(1), '$REQUIRED_VERSION') ? 0 : 1)" 2>/dev/null; then
+        REQUIRED_VERSION="18.0.0"
+        NODE_MAJOR_VERSION=$(echo $NODE_VERSION | cut -d'.' -f1 | sed 's/v//')
+        if [[ $NODE_MAJOR_VERSION -lt 18 ]]; then
             warning "Node.js versiyonu çok eski. Güncelleniyor..."
             install_nodejs_force
         else
