@@ -19,6 +19,10 @@ export default {
     },
     async mounted() {
 
+        // Frontend-only mode - skip backend API calls
+        console.log("Frontend-only mode: Skipping backend API calls");
+        this.$router.push("/dashboard");
+
         // There are only 3 cases that could come in here.
         // 1. Matched status Page domain name
         // 2. Vue Frontend Dev
