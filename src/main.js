@@ -37,7 +37,9 @@ const app = createApp({
     data() {
         return {
             appName: appName,
-            frontendOnlyMode: true  // Frontend-only mode flag
+            frontendOnlyMode: false,  // İlk kurulum için login aktif
+            loggedIn: false,  // İlk kurulum için login gerekli
+            allowLoginDialog: true  // Login dialog'u göster
         };
     },
     render: () => h(App),
