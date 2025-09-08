@@ -100,6 +100,13 @@ export default {
 
             this.socket.initedSocketIO = true;
 
+            // Frontend-only mode - disable socket.io connection
+            console.log("Frontend-only mode: Socket.io connection disabled");
+            this.socket.connected = false;
+            this.connectionErrorMsg = "Frontend-only mode: No backend server required";
+            this.showReverseProxyGuide = false;
+            return;
+
             let protocol = location.protocol + "//";
 
             let url;
