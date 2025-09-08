@@ -247,14 +247,23 @@ check_existing_installation() {
     
     if [[ -d "$INSTALL_DIR" ]] && [[ -f "$INSTALL_DIR/package.json" ]]; then
         warning "Mevcut BeyzTrack kurulumu bulundu!"
-        echo ""
-        echo -e "${YELLOW}Seçenekler:${NC}"
-        echo -e "  1) Mevcut kurulumu sil ve sıfırdan kur"
-        echo -e "  2) Mevcut kurulumun üzerine güncelle"
-        echo -e "  3) Kurulumu iptal et"
-        echo ""
-        echo -e "${CYAN}Seçiminizi yapın (1-3): ${NC}"
-        read choice
+        
+        # Interactive mode kontrolü
+        if [[ -t 0 ]]; then
+            # Interactive mode - kullanıcıdan seçim al
+            echo ""
+            echo -e "${YELLOW}Seçenekler:${NC}"
+            echo -e "  1) Mevcut kurulumu sil ve sıfırdan kur"
+            echo -e "  2) Mevcut kurulumun üzerine güncelle"
+            echo -e "  3) Kurulumu iptal et"
+            echo ""
+            echo -e "${CYAN}Seçiminizi yapın (1-3): ${NC}"
+            read choice
+        else
+            # Non-interactive mode - otomatik olarak sıfırdan kurulum yap
+            warning "Non-interactive mode: Otomatik olarak sıfırdan kurulum yapılacak"
+            choice="1"
+        fi
         
         case $choice in
             1)
