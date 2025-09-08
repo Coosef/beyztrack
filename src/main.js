@@ -36,7 +36,8 @@ const app = createApp({
     ],
     data() {
         return {
-            appName: appName
+            appName: appName,
+            frontendOnlyMode: true  // Frontend-only mode flag
         };
     },
     render: () => h(App),

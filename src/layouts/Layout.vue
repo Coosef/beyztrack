@@ -102,8 +102,8 @@
         </header>
 
         <main>
-            <router-view v-if="$root.loggedIn" />
-            <Login v-if="! $root.loggedIn && $root.allowLoginDialog" />
+            <router-view v-if="$root.loggedIn || $root.frontendOnlyMode" />
+            <Login v-if="! $root.loggedIn && ! $root.frontendOnlyMode && $root.allowLoginDialog" />
         </main>
 
         <!-- Mobile Only -->
