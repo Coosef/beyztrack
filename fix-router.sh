@@ -59,7 +59,12 @@ fix_router() {
         # Backup oluştur
         sudo cp "$router_file" "${router_file}.backup"
         
+        # Önce mevcut dosyayı kontrol et
+        info "Mevcut router.js içeriği kontrol ediliyor..."
+        sudo head -20 "$router_file"
+        
         # Router dosyasını tamamen yeniden yaz
+        info "Router.js tamamen yeniden yazılıyor..."
         sudo tee "$router_file" > /dev/null << 'EOF'
 import { createRouter, createWebHistory } from "vue-router";
 
@@ -128,6 +133,11 @@ export const router = createRouter({
 EOF
         
         success "Router.js düzeltildi"
+        
+        # Dosyanın gerçekten değiştiğini kontrol et
+        info "Router.js güncellenmiş içeriği kontrol ediliyor..."
+        sudo head -10 "$router_file"
+        
     else
         error "Router.js bulunamadı!"
         exit 1
