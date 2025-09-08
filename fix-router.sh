@@ -65,7 +65,6 @@ import { createRouter, createWebHistory } from "vue-router";
 
 import Layout from "./layouts/Layout.vue";
 import DashboardHome from "./pages/DashboardHome.vue";
-import SetupDatabase from "./pages/SetupDatabase.vue";
 import NotFound from "./pages/NotFound.vue";
 import CustomReportBuilder from "./components/reports/CustomReportBuilder.vue";
 import TodoList from "./components/TodoList.vue";
@@ -107,11 +106,6 @@ const routes = [
                 component: TodoList,
             },
         ],
-    },
-    {
-        // Setup database route for initial installation
-        path: "/setup-database",
-        component: SetupDatabase,
     },
     {
         path: "/:pathMatch(.*)*",
