@@ -276,7 +276,7 @@ install_beyztrack() {
             # Yeni dosyaları kopyala
             cp -r dist/* $INSTALL_DIR/
             cp package.json $INSTALL_DIR/
-            cp server.js $INSTALL_DIR/ 2>/dev/null || true
+            cp -r server/ $INSTALL_DIR/ 2>/dev/null || true
             # İzinleri düzelt
             chown -R www-data:www-data $INSTALL_DIR 2>/dev/null || true
             chmod -R 755 $INSTALL_DIR 2>/dev/null || true
@@ -286,7 +286,7 @@ install_beyztrack() {
             # Yeni dosyaları kopyala
             sudo cp -r dist/* $INSTALL_DIR/
             sudo cp package.json $INSTALL_DIR/
-            sudo cp server.js $INSTALL_DIR/ 2>/dev/null || true
+            sudo cp -r server/ $INSTALL_DIR/ 2>/dev/null || true
             # İzinleri düzelt
             sudo chown -R www-data:www-data $INSTALL_DIR 2>/dev/null || true
             sudo chmod -R 755 $INSTALL_DIR 2>/dev/null || true
@@ -313,14 +313,46 @@ install_beyztrack() {
     success "BeyzTrack kuruldu: $INSTALL_DIR"
 }
 
-# PM2 konfigürasyonu (Frontend için gerekli değil)
+# PM2 konfigürasyonu
 configure_pm2() {
     info "PM2 konfigürasyonu..."
     
-    # Frontend Vue.js uygulaması için PM2 gerekli değil
-    # Nginx ile static dosyalar serve edilecek
-    info "Frontend uygulaması için PM2 gerekli değil"
-    success "PM2 konfigürasyonu atlandı (Frontend uygulaması)"
+    INSTALL_DIR="/opt/beyztrack"
+    
+    # PM2 ecosystem config oluştur
+    cat > /tmp/beyztrack.config.js << EOF
+module.exports = {
+    apps: [{
+        name: 'beyztrack',
+        script: 'server/server.js',
+        cwd: '$INSTALL_DIR',
+        instances: 1,
+        autorestart: true,
+        watch: false,
+        max_memory_restart: '1G',
+        env: {
+            NODE_ENV: 'production',
+            PORT: 3001
+        }
+    }]
+};
+EOF
+    
+    if [[ $EUID -eq 0 ]]; then
+        mv /tmp/beyztrack.config.js $INSTALL_DIR/
+        chown www-data:www-data $INSTALL_DIR/beyztrack.config.js
+        pm2 start $INSTALL_DIR/beyztrack.config.js
+        pm2 save
+        pm2 startup
+    else
+        sudo mv /tmp/beyztrack.config.js $INSTALL_DIR/
+        sudo chown www-data:www-data $INSTALL_DIR/beyztrack.config.js
+        pm2 start $INSTALL_DIR/beyztrack.config.js
+        pm2 save
+        pm2 startup
+    fi
+    
+    success "PM2 konfigüre edildi ve backend server başlatıldı"
 }
 
 # Nginx konfigürasyonu
