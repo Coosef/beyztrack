@@ -253,7 +253,8 @@ check_existing_installation() {
         echo -e "  2) Mevcut kurulumun üzerine güncelle"
         echo -e "  3) Kurulumu iptal et"
         echo ""
-        read -p "Seçiminizi yapın (1-3): " choice
+        echo -e "${CYAN}Seçiminizi yapın (1-3): ${NC}"
+        read choice
         
         case $choice in
             1)
