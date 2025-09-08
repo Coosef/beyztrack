@@ -42,35 +42,28 @@ const routes = [
         redirect: "/dashboard",
     },
     {
-        // If it is "/dashboard", the active link is not working
-        // If it is "", it overrides the "/" unexpectedly
-        // Give a random name to solve the problem.
-        path: "/empty",
+        // Frontend-only mode: Simplified dashboard route
+        path: "/dashboard",
         component: Layout,
         children: [
             {
                 path: "",
-                component: Dashboard,
+                component: DashboardHome,
+            },
+            {
+                path: ":id",
+                component: EmptyLayout,
                 children: [
                     {
-                        name: "DashboardHome",
-                        path: "/dashboard",
-                        component: DashboardHome,
+                        path: "",
+                        component: Details,
                     },
                     {
-                        path: "/dashboard/:id",
-                        component: EmptyLayout,
-                        children: [
-                            {
-                                path: "",
-                                component: Details,
-                            },
-                            {
-                                path: "/edit/:id",
-                                component: EditMonitor,
-                            },
-                        ],
+                        path: "edit",
+                        component: EditMonitor,
                     },
+                ],
+            },
                     {
                         path: "/add",
                         component: EditMonitor,
