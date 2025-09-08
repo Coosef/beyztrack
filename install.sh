@@ -306,6 +306,17 @@ install_beyztrack() {
         sudo npm install --production --legacy-peer-deps
     fi
     
+    # Eski veritabanı dosyalarını temizle (sıfırdan kurulum için)
+    info "Eski veritabanı dosyaları temizleniyor..."
+    if [[ $EUID -eq 0 ]]; then
+        rm -rf /root/.uptime-kuma 2>/dev/null || true
+        rm -rf /home/*/.uptime-kuma 2>/dev/null || true
+    else
+        sudo rm -rf /root/.uptime-kuma 2>/dev/null || true
+        sudo rm -rf /home/*/.uptime-kuma 2>/dev/null || true
+    fi
+    success "Eski veritabanı dosyaları temizlendi"
+    
     # Geçici dosyaları temizle
     cd /tmp
     rm -rf beyztrack
@@ -332,7 +343,8 @@ module.exports = {
         max_memory_restart: '1G',
         env: {
             NODE_ENV: 'production',
-            PORT: 3001
+            PORT: 3001,
+            UPTIME_KUMA_DISABLE_FRAME_SAMEORIGIN: '1'
         }
     }]
 };
