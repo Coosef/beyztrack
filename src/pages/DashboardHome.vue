@@ -142,7 +142,8 @@ export default {
     },
     computed: {
         stats() {
-            return this.$root.stats || {
+            // Frontend-only mode: Mock data
+            return {
                 total: 0,
                 up: 0,
                 down: 0,
