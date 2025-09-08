@@ -269,15 +269,29 @@ install_beyztrack() {
     
     # Build dosyalarını kurulum dizinine kopyala
     if [[ -d "dist" ]]; then
+        info "Build dosyaları kopyalanıyor..."
         if [[ $EUID -eq 0 ]]; then
+            # Eski dosyaları temizle
+            rm -rf $INSTALL_DIR/*
+            # Yeni dosyaları kopyala
             cp -r dist/* $INSTALL_DIR/
             cp package.json $INSTALL_DIR/
             cp server.js $INSTALL_DIR/ 2>/dev/null || true
+            # İzinleri düzelt
+            chown -R www-data:www-data $INSTALL_DIR 2>/dev/null || true
+            chmod -R 755 $INSTALL_DIR 2>/dev/null || true
         else
+            # Eski dosyaları temizle
+            sudo rm -rf $INSTALL_DIR/*
+            # Yeni dosyaları kopyala
             sudo cp -r dist/* $INSTALL_DIR/
             sudo cp package.json $INSTALL_DIR/
             sudo cp server.js $INSTALL_DIR/ 2>/dev/null || true
+            # İzinleri düzelt
+            sudo chown -R www-data:www-data $INSTALL_DIR 2>/dev/null || true
+            sudo chmod -R 755 $INSTALL_DIR 2>/dev/null || true
         fi
+        success "Build dosyaları kopyalandı ve izinler düzeltildi"
     else
         error "Build başarısız oldu"
     fi
