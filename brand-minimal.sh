@@ -146,6 +146,12 @@ rebuild_frontend() {
 check_backend_status() {
     info "Backend server durumu kontrol ediliyor..."
     
+    # PM2 kurulu mu kontrol et
+    if ! command -v pm2 >/dev/null 2>&1; then
+        echo "    ❌ PM2 kurulu değil, kuruluyor..."
+        install_pm2
+    fi
+    
     # PM2 durumunu kontrol et
     if command -v pm2 >/dev/null 2>&1; then
         echo "    📊 PM2 durumu:"
@@ -158,7 +164,7 @@ check_backend_status() {
             echo "    ❌ Uptime Kuma PM2'de çalışmıyor"
         fi
     else
-        echo "    ❌ PM2 kurulu değil"
+        echo "    ❌ PM2 kurulumu başarısız"
     fi
     
     # Port 3001'i kontrol et
@@ -169,6 +175,23 @@ check_backend_status() {
     fi
 }
 
+# PM2 kurulumu
+install_pm2() {
+    info "PM2 kuruluyor..."
+    
+    # NPM ile PM2 kur
+    sudo npm install -g pm2 2>/dev/null || {
+        error "PM2 kurulumu başarısız!"
+        return 1
+    }
+    
+    # PM2'yi başlat
+    pm2 startup 2>/dev/null || true
+    pm2 save 2>/dev/null || true
+    
+    success "PM2 kuruldu"
+}
+
 # Backend'i restart et
 restart_backend() {
     info "Backend server yeniden başlatılıyor..."
@@ -176,18 +199,28 @@ restart_backend() {
     # PM2 ile restart
     if command -v pm2 >/dev/null 2>&1; then
         echo "    🔄 PM2 ile restart ediliyor..."
-        pm2 restart uptime-kuma 2>/dev/null || {
-            echo "    ❌ PM2 restart başarısız, yeniden başlatılıyor..."
-            pm2 stop uptime-kuma 2>/dev/null || true
-            pm2 start /opt/uptime-kuma/server/server.js --name uptime-kuma 2>/dev/null || true
+        
+        # Önce mevcut process'i durdur
+        pm2 stop uptime-kuma 2>/dev/null || true
+        pm2 delete uptime-kuma 2>/dev/null || true
+        
+        # Yeni process başlat
+        cd "/opt/uptime-kuma"
+        pm2 start server/server.js --name uptime-kuma 2>/dev/null || {
+            error "Backend başlatılamadı!"
+            return 1
         }
         
         # PM2 durumunu kontrol et
-        sleep 3
+        sleep 5
         if pm2 list | grep -q "uptime-kuma.*online"; then
             echo "    ✅ Backend başarıyla başlatıldı"
+            
+            # PM2'yi kaydet
+            pm2 save 2>/dev/null || true
         else
             echo "    ❌ Backend başlatılamadı"
+            pm2 logs uptime-kuma --lines 10 2>/dev/null || true
         fi
     else
         echo "    ❌ PM2 bulunamadı"
