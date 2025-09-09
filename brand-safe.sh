@@ -96,7 +96,7 @@ check_backend_status() {
     fi
     
     # Port 3001'i kontrol et
-    if netstat -tlnp 2>/dev/null | grep -q ":3001"; then
+    if ss -tlnp 2>/dev/null | grep -q ":3001" || netstat -tlnp 2>/dev/null | grep -q ":3001"; then
         echo "    ✅ Port 3001 açık"
     else
         echo "    ❌ Port 3001 kapalı"
