@@ -4,6 +4,10 @@ import Layout from "./layouts/Layout.vue";
 import DashboardHome from "./pages/DashboardHome.vue";
 import NotFound from "./pages/NotFound.vue";
 import AdvancedReports from "./pages/AdvancedReports.vue";
+import Settings from "./pages/Settings.vue";
+import Todo from "./pages/Todo.vue";
+import Backup from "./pages/Backup.vue";
+import StatusPages from "./pages/StatusPages.vue";
 
 const routes = [
     {
@@ -36,7 +40,7 @@ const routes = [
         children: [
             {
                 path: "",
-                component: NotFound, // Geçici olarak NotFound
+                component: StatusPages,
             },
         ],
     },
@@ -46,7 +50,7 @@ const routes = [
         children: [
             {
                 path: "",
-                component: NotFound, // Geçici olarak NotFound
+                component: Todo,
             },
         ],
     },
@@ -56,7 +60,7 @@ const routes = [
         children: [
             {
                 path: "",
-                component: NotFound, // Geçici olarak NotFound
+                component: Settings,
             },
         ],
     },
@@ -66,7 +70,7 @@ const routes = [
         children: [
             {
                 path: "",
-                component: NotFound, // Geçici olarak NotFound
+                component: Backup,
             },
         ],
     },
