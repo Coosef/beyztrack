@@ -206,11 +206,19 @@ EOF
 # Firewall konfigürasyonu
 configure_firewall() {
     info "🔥 Firewall konfigürasyonu yapılıyor..."
-    sudo ufw allow 80/tcp || warning "UFW port 80 açılamadı."
-    sudo ufw allow 443/tcp || warning "UFW port 443 açılamadı."
-    sudo ufw allow 22/tcp || warning "UFW port 22 açılamadı."
-    sudo ufw --force enable || error "UFW etkinleştirilemedi."
-    success "✅ Firewall konfigürasyonu tamamlandı"
+    
+    # UFW kurulu mu kontrol et
+    if command -v ufw &>/dev/null; then
+        sudo ufw allow 80/tcp || warning "UFW port 80 açılamadı."
+        sudo ufw allow 443/tcp || warning "UFW port 443 açılamadı."
+        sudo ufw allow 22/tcp || warning "UFW port 22 açılamadı."
+        sudo ufw --force enable || warning "UFW etkinleştirilemedi."
+        success "✅ Firewall konfigürasyonu tamamlandı"
+    else
+        warning "⚠️  UFW kurulu değil. Firewall konfigürasyonu atlanıyor."
+        info "💡 Manuel olarak firewall kurmak için: sudo apt-get install ufw"
+        success "✅ Firewall konfigürasyonu atlandı"
+    fi
 }
 
 # Ana fonksiyon
