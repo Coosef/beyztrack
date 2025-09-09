@@ -126,13 +126,18 @@ add_beyztrack_features() {
     
     # util-frontend.js'i kopyala
     echo "    📄 util-frontend.js kopyalanıyor..."
-    sudo cp "$TEMP_DIR/src/util-frontend.js" "/opt/uptime-kuma/src/" 2>/dev/null || true
-    
-    # Kopyalama kontrolü
-    if [ -f "/opt/uptime-kuma/src/util-frontend.js" ]; then
-        echo "    ✅ util-frontend.js başarıyla kopyalandı"
+    if [ -f "$TEMP_DIR/src/util-frontend.js" ]; then
+        echo "    ✅ util-frontend.js kaynak dosyası bulundu"
+        sudo cp "$TEMP_DIR/src/util-frontend.js" "/opt/uptime-kuma/src/" 2>/dev/null || true
+        
+        # Kopyalama kontrolü
+        if [ -f "/opt/uptime-kuma/src/util-frontend.js" ]; then
+            echo "    ✅ util-frontend.js başarıyla kopyalandı"
+        else
+            echo "    ❌ util-frontend.js kopyalanamadı!"
+        fi
     else
-        echo "    ❌ util-frontend.js kopyalanamadı!"
+        echo "    ❌ util-frontend.js kaynak dosyası bulunamadı!"
     fi
     
     # Router ve main.js'i güncelle - Tüm route'ları ekle
