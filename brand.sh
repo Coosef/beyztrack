@@ -101,6 +101,32 @@ update_visual_files() {
     success "✅ Görsel dosyalar güncellendi"
 }
 
+# BeyzTrack özelliklerini ekle
+add_beyztrack_features() {
+    info "🚀 BeyzTrack özellikleri ekleniyor..."
+    
+    # Advanced Reports sayfasını kopyala
+    sudo cp "$TEMP_DIR/src/pages/AdvancedReports.vue" "/opt/uptime-kuma/src/pages/" 2>/dev/null || true
+    
+    # Report componentlerini kopyala
+    sudo mkdir -p "/opt/uptime-kuma/src/components/reports"
+    sudo cp -r "$TEMP_DIR/src/components/reports/"* "/opt/uptime-kuma/src/components/reports/" 2>/dev/null || true
+    
+    # Report utils'i kopyala
+    sudo cp "$TEMP_DIR/src/utils/reportUtils.js" "/opt/uptime-kuma/src/utils/" 2>/dev/null || true
+    
+    # Router'ı güncelle - Advanced Reports route ekle
+    sudo cp "$TEMP_DIR/src/router.js" "/opt/uptime-kuma/src/" 2>/dev/null || true
+    
+    # Layout'u güncelle - Backup menüsü ekle
+    sudo cp "$TEMP_DIR/src/layouts/Layout.vue" "/opt/uptime-kuma/src/layouts/" 2>/dev/null || true
+    
+    # Dil dosyalarını güncelle
+    sudo cp "$TEMP_DIR/src/lang/tr-TR.json" "/opt/uptime-kuma/src/lang/" 2>/dev/null || true
+    
+    success "✅ BeyzTrack özellikleri eklendi"
+}
+
 # Layout.vue'yi güncelle (sadece logo ve isim)
 update_layout() {
     info " Layout.vue güncelleniyor..."
@@ -169,6 +195,7 @@ main() {
     create_backup
     download_beyztrack
     update_visual_files
+    add_beyztrack_features
     update_layout
     rebuild_frontend
     restart_service
