@@ -92,8 +92,8 @@ install_uptime_kuma() {
 
     # Son versiyonu al
     info "📌 Uptime Kuma son versiyonuna geçiliyor..."
-    sudo git checkout main || error "Main branch'e geçilemedi."
-    sudo git pull origin main || error "Son değişiklikler alınamadı."
+    sudo git checkout master || error "Master branch'e geçilemedi."
+    sudo git pull origin master || error "Son değişiklikler alınamadı."
 
     info "📦 Dependencies kuruluyor..."
     sudo npm install --legacy-peer-deps || error "Dependencies kurulumu başarısız."
