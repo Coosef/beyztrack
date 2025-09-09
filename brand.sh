@@ -52,7 +52,8 @@ download_beyztrack() {
     git clone https://github.com/Coosef/beyztrack.git "$TEMP_DIR"
     
     echo -e "${GREEN}✅ BeyzTrack dosyaları indirildi${NC}"
-    echo "$TEMP_DIR"
+    # Return değerini echo'dan ayır
+    printf "%s" "$TEMP_DIR"
 }
 
 # Frontend dosyalarını güncelle
