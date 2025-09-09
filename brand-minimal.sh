@@ -179,17 +179,45 @@ check_backend_status() {
 install_pm2() {
     info "PM2 kuruluyor..."
     
-    # NPM ile PM2 kur
-    sudo npm install -g pm2 2>/dev/null || {
-        error "PM2 kurulumu başarısız!"
+    # Node.js ve NPM kontrolü
+    if ! command -v node >/dev/null 2>&1; then
+        error "Node.js kurulu değil!"
         return 1
+    fi
+    
+    if ! command -v npm >/dev/null 2>&1; then
+        error "NPM kurulu değil!"
+        return 1
+    fi
+    
+    echo "    📦 Node.js versiyonu: $(node --version)"
+    echo "    📦 NPM versiyonu: $(npm --version)"
+    
+    # NPM ile PM2 kur
+    echo "    🔄 PM2 kuruluyor..."
+    sudo npm install -g pm2 --legacy-peer-deps 2>/dev/null || {
+        error "PM2 kurulumu başarısız!"
+        echo "    🔄 Alternatif kurulum deneniyor..."
+        sudo npm install -g pm2 2>/dev/null || {
+            error "PM2 kurulumu tamamen başarısız!"
+            return 1
+        }
     }
     
-    # PM2'yi başlat
-    pm2 startup 2>/dev/null || true
-    pm2 save 2>/dev/null || true
-    
-    success "PM2 kuruldu"
+    # PM2'yi test et
+    if command -v pm2 >/dev/null 2>&1; then
+        echo "    ✅ PM2 başarıyla kuruldu"
+        pm2 --version 2>/dev/null || true
+        
+        # PM2'yi başlat
+        pm2 startup 2>/dev/null || true
+        pm2 save 2>/dev/null || true
+        
+        success "PM2 kuruldu ve yapılandırıldı"
+    else
+        error "PM2 kurulumu başarısız!"
+        return 1
+    fi
 }
 
 # Backend'i restart et
