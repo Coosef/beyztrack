@@ -102,7 +102,7 @@
         </header>
 
         <main>
-            <router-view v-if="$root.loggedIn" />
+            <router-view />
             <Login v-if="! $root.loggedIn && $root.allowLoginDialog" />
         </main>
 
