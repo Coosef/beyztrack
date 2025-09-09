@@ -113,9 +113,13 @@ export default {
                 // Development mode - connect to localhost:3001 directly
                 url = "http://localhost:3001";
             } else {
-                // Connect to the current url
-                url = undefined;
+                // Production mode - connect to current host
+                url = protocol + location.host;
             }
+            
+            console.log("Bağlantı URL:", url);
+            console.log("Protocol:", protocol);
+            console.log("Location host:", location.host);
 
             socket = io(url, {
                 transports: ['websocket', 'polling'],
