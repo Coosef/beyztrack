@@ -37,10 +37,28 @@
 
 ## 🚀 Hızlı Kurulum
 
-### **Tek Komutla Kurulum (Linux)**
+### **Yöntem 1: 2 Aşamalı Kurulum (Önerilen)**
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/kullanici/beyztrack/main/install.sh | bash
+# 1. Orijinal Uptime Kuma kurulumu
+curl -sSL https://raw.githubusercontent.com/Coosef/beyztrack/main/install-original.sh | bash
+
+# 2. BeyzTrack branding uygulama
+curl -sSL https://raw.githubusercontent.com/Coosef/beyztrack/main/brand.sh | bash
+```
+
+### **Yöntem 2: Tek Komutla Tam Kurulum**
+
+```bash
+# Hem orijinal kurulum hem de branding
+curl -sSL https://raw.githubusercontent.com/Coosef/beyztrack/main/install-main.sh | bash
+```
+
+### **Yöntem 3: Sadece Branding (Uptime Kuma zaten kurulu)**
+
+```bash
+# Sadece BeyzTrack özelliklerini ekle
+curl -sSL https://raw.githubusercontent.com/Coosef/beyztrack/main/brand.sh | bash
 ```
 
 ### **Manuel Kurulum**
