@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# Uptime Kuma 1.23.16 Kurulum Script'i
-# Temiz kurulum - sadece Uptime Kuma
-# Kullanım: curl -sSL https://raw.githubusercontent.com/Coosef/beyztrack/main/install-uptime-kuma-1.23.16.sh | bash
+# Uptime Kuma Latest Kurulum Script'i
+# Temiz kurulum - sadece Uptime Kuma (Son versiyon)
+# Kullanım: curl -sSL https://raw.githubusercontent.com/Coosef/beyztrack/main/install-uptime-kuma-latest.sh | bash
 
 set -e
 
@@ -24,7 +24,7 @@ print_logo() {
     echo " | |_) | |_| | | | | (_| |   | | | | (_| | |   "
     echo " |____/ \__,_|_| |_|\__,_|   |_|_|  \__,_|_|   "
     echo -e "${NC}"
-    echo -e "${GREEN}🚀 Uptime Kuma 1.23.16 Kurulumu${NC}"
+    echo -e "${GREEN}🚀 Uptime Kuma Latest Kurulumu${NC}"
     echo ""
 }
 
@@ -65,11 +65,11 @@ install_git() {
 # Node.js kurulumu
 install_nodejs() {
     info "📦 Node.js kurulumu kontrol ediliyor..."
-    if command -v node &>/dev/null && node --version | grep -q "v18"; then
+    if command -v node &>/dev/null && node --version | grep -q "v18\|v20"; then
         success "✅ Node.js $(node --version) zaten kurulu"
     else
         warning "⚠️  Node.js 18+ kurulu değil. Kuruluyor..."
-        curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash - || error "Node.js repository eklenemedi."
+        curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash - || error "Node.js repository eklenemedi."
         sudo apt-get install -y nodejs || error "Node.js kurulumu başarısız."
         success "✅ Node.js kuruldu."
     fi
@@ -77,7 +77,7 @@ install_nodejs() {
 
 # Uptime Kuma kurulumu
 install_uptime_kuma() {
-    info "📥 Uptime Kuma 1.23.16 kuruluyor..."
+    info "📥 Uptime Kuma Latest kuruluyor..."
     INSTALL_DIR="/opt/uptime-kuma"
 
     if [ -d "$INSTALL_DIR" ]; then
@@ -90,11 +90,12 @@ install_uptime_kuma() {
     
     cd "$INSTALL_DIR" || error "Dizin değiştirilemedi: $INSTALL_DIR"
 
-    # 1.23.16 versiyonuna geç
-    info "📌 Uptime Kuma 1.23.16 versiyonuna geçiliyor..."
-    sudo git checkout 1.23.16 || error "Versiyon değiştirilemedi."
+    # Son versiyonu al
+    info "📌 Uptime Kuma son versiyonuna geçiliyor..."
+    sudo git checkout main || error "Main branch'e geçilemedi."
+    sudo git pull origin main || error "Son değişiklikler alınamadı."
 
-    info " Dependencies kuruluyor..."
+    info "📦 Dependencies kuruluyor..."
     sudo npm install --legacy-peer-deps || error "Dependencies kurulumu başarısız."
 
     info "🔨 Frontend build ediliyor..."
@@ -105,7 +106,7 @@ install_uptime_kuma() {
     sudo chown -R www-data:www-data "$INSTALL_DIR" || error "Dosya sahipliği ayarlanamadı."
     sudo chmod -R 755 "$INSTALL_DIR" || error "Dosya izinleri ayarlanamadı."
 
-    success "✅ Uptime Kuma 1.23.16 kurulumu tamamlandı"
+    success "✅ Uptime Kuma Latest kurulumu tamamlandı"
 }
 
 # systemd servisi oluştur
@@ -145,6 +146,13 @@ EOF
 configure_nginx() {
     info "⚙️  Nginx konfigürasyonu yapılıyor..."
     INSTALL_DIR="/opt/uptime-kuma"
+
+    # Nginx kurulumu
+    if ! command -v nginx &>/dev/null; then
+        info "📦 Nginx kuruluyor..."
+        sudo apt-get update
+        sudo apt-get install -y nginx || error "Nginx kurulumu başarısız."
+    fi
 
     # Default site'ı devre dışı bırak
     sudo rm -f /etc/nginx/sites-enabled/default
@@ -197,7 +205,7 @@ EOF
 
 # Firewall konfigürasyonu
 configure_firewall() {
-    info "️  Firewall konfigürasyonu yapılıyor..."
+    info "🔥 Firewall konfigürasyonu yapılıyor..."
     sudo ufw allow 80/tcp || warning "UFW port 80 açılamadı."
     sudo ufw allow 443/tcp || warning "UFW port 443 açılamadı."
     sudo ufw allow 22/tcp || warning "UFW port 22 açılamadı."
@@ -223,7 +231,7 @@ main() {
 
     echo -e "${GREEN}"
     echo "╔══════════════════════════════════════════════════════════════╗"
-    echo "║             Uptime Kuma 1.23.16 Kurulumu Tamamlandı!        ║"
+    echo "║             Uptime Kuma Latest Kurulumu Tamamlandı!         ║"
     echo "╚══════════════════════════════════════════════════════════════╝"
     echo ""
     echo -e "${BLUE}🌐 Uptime Kuma Web Arayüz: http://localhost${NC}"
@@ -231,6 +239,9 @@ main() {
     echo ""
     echo -e "${YELLOW}⚠️  Şimdi BeyzTrack branding scriptini çalıştırabilirsiniz:${NC}"
     echo -e "${BLUE}   curl -sSL https://raw.githubusercontent.com/Coosef/beyztrack/main/brand.sh | bash${NC}"
+    echo ""
+    echo -e "${CYAN}📝 Not: İlk kurulumda setup ekranı açılacak.${NC}"
+    echo -e "${CYAN}   Database ve admin kullanıcısı oluşturduktan sonra branding yapın.${NC}"
     echo ""
 }
 
