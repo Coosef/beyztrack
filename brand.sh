@@ -105,14 +105,16 @@ update_visual_files() {
 add_beyztrack_features() {
     info "🚀 BeyzTrack özellikleri ekleniyor..."
     
-    # Advanced Reports sayfasını kopyala
+    # Pages dizinini oluştur ve Advanced Reports sayfasını kopyala
+    sudo mkdir -p "/opt/uptime-kuma/src/pages"
     sudo cp "$TEMP_DIR/src/pages/AdvancedReports.vue" "/opt/uptime-kuma/src/pages/" 2>/dev/null || true
     
     # Report componentlerini kopyala
     sudo mkdir -p "/opt/uptime-kuma/src/components/reports"
     sudo cp -r "$TEMP_DIR/src/components/reports/"* "/opt/uptime-kuma/src/components/reports/" 2>/dev/null || true
     
-    # Report utils'i kopyala
+    # Utils dizinini oluştur ve reportUtils'i kopyala
+    sudo mkdir -p "/opt/uptime-kuma/src/utils"
     sudo cp "$TEMP_DIR/src/utils/reportUtils.js" "/opt/uptime-kuma/src/utils/" 2>/dev/null || true
     
     # Router'ı güncelle - Tüm route'ları ekle
