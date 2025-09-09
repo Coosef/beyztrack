@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import Layout from "./layouts/Layout.vue";
 import DashboardHome from "./pages/DashboardHome.vue";
 import NotFound from "./pages/NotFound.vue";
+import AdvancedReports from "./pages/AdvancedReports.vue";
 
 const routes = [
     {
@@ -10,7 +11,6 @@ const routes = [
         redirect: "/dashboard",
     },
     {
-        // Frontend-only mode: Simplified dashboard route
         path: "/dashboard",
         component: Layout,
         children: [
@@ -21,12 +21,63 @@ const routes = [
         ],
     },
     {
+        path: "/reports",
+        component: Layout,
+        children: [
+            {
+                path: "",
+                component: AdvancedReports,
+            },
+        ],
+    },
+    {
+        path: "/manage-status-page",
+        component: Layout,
+        children: [
+            {
+                path: "",
+                component: NotFound, // Geçici olarak NotFound
+            },
+        ],
+    },
+    {
+        path: "/todo",
+        component: Layout,
+        children: [
+            {
+                path: "",
+                component: NotFound, // Geçici olarak NotFound
+            },
+        ],
+    },
+    {
+        path: "/settings",
+        component: Layout,
+        children: [
+            {
+                path: "",
+                component: NotFound, // Geçici olarak NotFound
+            },
+        ],
+    },
+    {
+        path: "/backup",
+        component: Layout,
+        children: [
+            {
+                path: "",
+                component: NotFound, // Geçici olarak NotFound
+            },
+        ],
+    },
+    {
         path: "/:pathMatch(.*)*",
         component: NotFound,
     },
 ];
 
-export const router = createRouter({
+// Default export olarak dışa aktar
+export default createRouter({
     linkActiveClass: "active",
     history: createWebHistory(),
     routes,

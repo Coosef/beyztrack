@@ -115,7 +115,7 @@ add_beyztrack_features() {
     # Report utils'i kopyala
     sudo cp "$TEMP_DIR/src/utils/reportUtils.js" "/opt/uptime-kuma/src/utils/" 2>/dev/null || true
     
-    # Router'ı güncelle - Advanced Reports route ekle
+    # Router'ı güncelle - Tüm route'ları ekle
     sudo cp "$TEMP_DIR/src/router.js" "/opt/uptime-kuma/src/" 2>/dev/null || true
     
     # Layout'u güncelle - Backup menüsü ekle
