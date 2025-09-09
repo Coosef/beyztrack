@@ -14,7 +14,7 @@
                             </div>
                             <div class="flex-grow-1 ms-3">
                                 <h5 class="card-title mb-0">{{ $t("Total Monitors") }}</h5>
-                                <span class="num">{{ $root.stats.total }}</span>
+                                <span class="num">{{ $root.stats ? $root.stats.total : 0 }}</span>
                             </div>
                         </div>
                     </div>
@@ -34,7 +34,7 @@
                             </div>
                             <div class="flex-grow-1 ms-3">
                                 <h5 class="card-title mb-0">{{ $t("Up") }}</h5>
-                                <span class="num">{{ $root.stats.up }}</span>
+                                <span class="num">{{ $root.stats ? $root.stats.up : 0 }}</span>
                             </div>
                         </div>
                     </div>
@@ -54,7 +54,7 @@
                             </div>
                             <div class="flex-grow-1 ms-3">
                                 <h5 class="card-title mb-0">{{ $t("Down") }}</h5>
-                                <span class="num">{{ $root.stats.down }}</span>
+                                <span class="num">{{ $root.stats ? $root.stats.down : 0 }}</span>
                             </div>
                         </div>
                     </div>
@@ -74,7 +74,7 @@
                             </div>
                             <div class="flex-grow-1 ms-3">
                                 <h5 class="card-title mb-0">{{ $t("Maintenance") }}</h5>
-                                <span class="num">{{ $root.stats.maintenance }}</span>
+                                <span class="num">{{ $root.stats ? $root.stats.maintenance : 0 }}</span>
                             </div>
                         </div>
                     </div>

@@ -176,6 +176,12 @@ update_layout() {
     sudo sed -i 's/Uptime Kuma/BeyzTrack/g' "/opt/uptime-kuma/src/layouts/Layout.vue"
     sudo sed -i 's/A fancy self-hosted monitoring tool/Monitoring \& Reporting System/g' "/opt/uptime-kuma/src/layouts/Layout.vue"
     
+    # Tüm dosyalarda Uptime Kuma → BeyzTrack değişikliği
+    echo "    🔄 Tüm dosyalarda branding güncelleniyor..."
+    sudo find "/opt/uptime-kuma/src" -type f -name "*.vue" -o -name "*.js" -o -name "*.json" | xargs sudo sed -i 's/Uptime Kuma/BeyzTrack/g' 2>/dev/null || true
+    sudo find "/opt/uptime-kuma/src" -type f -name "*.vue" -o -name "*.js" -o -name "*.json" | xargs sudo sed -i 's/uptime-kuma/beyztrack/g' 2>/dev/null || true
+    echo "    ✅ Branding güncellendi"
+    
     success "✅ Layout.vue güncellendi"
 }
 

@@ -75,6 +75,30 @@ const routes = [
         ],
     },
     {
+        path: "/settings",
+        component: Layout,
+        children: [
+            {
+                path: "",
+                component: Settings,
+            },
+            {
+                path: "general",
+                component: Settings,
+            },
+        ],
+    },
+    {
+        path: "/maintenance",
+        component: Layout,
+        children: [
+            {
+                path: "",
+                component: Settings,
+            },
+        ],
+    },
+    {
         path: "/:pathMatch(.*)*",
         component: NotFound,
     },
