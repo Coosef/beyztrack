@@ -53,11 +53,17 @@ main() {
         exit 1
     fi
     
+    # Backend server durumunu kontrol et
+    check_backend_status
+    
     # Minimal branding uygula
     apply_minimal_branding
     
     # Frontend'i rebuild et
     rebuild_frontend
+    
+    # Backend'i restart et
+    restart_backend
     
     success "Minimal branding tamamlandı!"
     echo ""
@@ -134,6 +140,58 @@ rebuild_frontend() {
     sudo systemctl restart nginx 2>/dev/null || true
     
     success "Frontend rebuild tamamlandı"
+}
+
+# Backend server durumunu kontrol et
+check_backend_status() {
+    info "Backend server durumu kontrol ediliyor..."
+    
+    # PM2 durumunu kontrol et
+    if command -v pm2 >/dev/null 2>&1; then
+        echo "    📊 PM2 durumu:"
+        pm2 status 2>/dev/null || echo "    ❌ PM2 çalışmıyor"
+        
+        # Uptime Kuma process'ini kontrol et
+        if pm2 list | grep -q "uptime-kuma"; then
+            echo "    ✅ Uptime Kuma PM2'de çalışıyor"
+        else
+            echo "    ❌ Uptime Kuma PM2'de çalışmıyor"
+        fi
+    else
+        echo "    ❌ PM2 kurulu değil"
+    fi
+    
+    # Port 3001'i kontrol et
+    if netstat -tlnp 2>/dev/null | grep -q ":3001"; then
+        echo "    ✅ Port 3001 açık"
+    else
+        echo "    ❌ Port 3001 kapalı"
+    fi
+}
+
+# Backend'i restart et
+restart_backend() {
+    info "Backend server yeniden başlatılıyor..."
+    
+    # PM2 ile restart
+    if command -v pm2 >/dev/null 2>&1; then
+        echo "    🔄 PM2 ile restart ediliyor..."
+        pm2 restart uptime-kuma 2>/dev/null || {
+            echo "    ❌ PM2 restart başarısız, yeniden başlatılıyor..."
+            pm2 stop uptime-kuma 2>/dev/null || true
+            pm2 start /opt/uptime-kuma/server/server.js --name uptime-kuma 2>/dev/null || true
+        }
+        
+        # PM2 durumunu kontrol et
+        sleep 3
+        if pm2 list | grep -q "uptime-kuma.*online"; then
+            echo "    ✅ Backend başarıyla başlatıldı"
+        else
+            echo "    ❌ Backend başlatılamadı"
+        fi
+    else
+        echo "    ❌ PM2 bulunamadı"
+    fi
 }
 
 # Script'i çalıştır
