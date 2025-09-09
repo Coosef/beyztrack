@@ -24,6 +24,7 @@ echo -e "${NC}"
 # Kurulum dizini
 INSTALL_DIR="/opt/uptime-kuma"
 BACKUP_DIR="/opt/uptime-kuma-backup-$(date +%Y%m%d-%H%M%S)"
+TEMP_DIR=""
 
 # Backup oluştur
 create_backup() {
@@ -52,25 +53,21 @@ download_beyztrack() {
     git clone https://github.com/Coosef/beyztrack.git "$TEMP_DIR"
     
     echo -e "${GREEN}✅ BeyzTrack dosyaları indirildi${NC}"
-    # Return değerini echo'dan ayır
-    printf "%s" "$TEMP_DIR"
 }
 
 # Frontend dosyalarını güncelle
 update_frontend() {
     echo -e "${CYAN}🎨 Frontend dosyaları güncelleniyor...${NC}"
     
-    local temp_dir="$1"
-    
     # Frontend dosyalarını kopyala
-    sudo cp -r "$temp_dir/src"/* "$INSTALL_DIR/src/"
-    sudo cp -r "$temp_dir/public"/* "$INSTALL_DIR/public/" 2>/dev/null || true
-    sudo cp "$temp_dir/package.json" "$INSTALL_DIR/"
-    sudo cp "$temp_dir/index.html" "$INSTALL_DIR/"
+    sudo cp -r "$TEMP_DIR/src"/* "$INSTALL_DIR/src/"
+    sudo cp -r "$TEMP_DIR/public"/* "$INSTALL_DIR/public/" 2>/dev/null || true
+    sudo cp "$TEMP_DIR/package.json" "$INSTALL_DIR/"
+    sudo cp "$TEMP_DIR/index.html" "$INSTALL_DIR/"
     
     # Vite config
     sudo mkdir -p "$INSTALL_DIR/config"
-    sudo cp "$temp_dir/config/vite.config.js" "$INSTALL_DIR/config/"
+    sudo cp "$TEMP_DIR/config/vite.config.js" "$INSTALL_DIR/config/"
     
     # Ownership düzelt
     sudo chown -R www-data:www-data "$INSTALL_DIR"
@@ -173,8 +170,8 @@ cleanup() {
     echo -e "${CYAN}🧹 Temizlik yapılıyor...${NC}"
     
     # Geçici dosyaları temizle
-    if [ -n "$1" ] && [ -d "$1" ]; then
-        rm -rf "$1"
+    if [ -n "$TEMP_DIR" ] && [ -d "$TEMP_DIR" ]; then
+        rm -rf "$TEMP_DIR"
     fi
     
     echo -e "${GREEN}✅ Temizlik tamamlandı${NC}"
@@ -205,16 +202,14 @@ branding_complete() {
 
 # Ana branding fonksiyonu
 main() {
-    local temp_dir=""
-    
     create_backup
-    temp_dir=$(download_beyztrack)
-    update_frontend "$temp_dir"
+    download_beyztrack
+    update_frontend
     update_dependencies
     rebuild_frontend
     update_nginx
     restart_pm2
-    cleanup "$temp_dir"
+    cleanup
     branding_complete
 }
 
