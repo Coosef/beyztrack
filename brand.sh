@@ -124,8 +124,9 @@ add_beyztrack_features() {
     sudo mkdir -p "/opt/uptime-kuma/src/utils"
     sudo cp "$TEMP_DIR/src/utils/reportUtils.js" "/opt/uptime-kuma/src/utils/" 2>/dev/null || true
     
-    # Router'ı güncelle - Tüm route'ları ekle
+    # Router ve main.js'i güncelle - Tüm route'ları ekle
     sudo cp "$TEMP_DIR/src/router.js" "/opt/uptime-kuma/src/" 2>/dev/null || true
+    sudo cp "$TEMP_DIR/src/main.js" "/opt/uptime-kuma/src/" 2>/dev/null || true
     
     # Layout'u güncelle - Backup menüsü ekle
     sudo cp "$TEMP_DIR/src/layouts/Layout.vue" "/opt/uptime-kuma/src/layouts/" 2>/dev/null || true
