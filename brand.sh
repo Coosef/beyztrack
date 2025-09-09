@@ -105,13 +105,20 @@ update_visual_files() {
 add_beyztrack_features() {
     info "🚀 BeyzTrack özellikleri ekleniyor..."
     
-    # Pages dizinini oluştur ve Advanced Reports sayfasını kopyala
+    # Pages dizinini oluştur ve tüm sayfa dosyalarını kopyala
     sudo mkdir -p "/opt/uptime-kuma/src/pages"
     sudo cp "$TEMP_DIR/src/pages/AdvancedReports.vue" "/opt/uptime-kuma/src/pages/" 2>/dev/null || true
+    sudo cp "$TEMP_DIR/src/pages/Settings.vue" "/opt/uptime-kuma/src/pages/" 2>/dev/null || true
+    sudo cp "$TEMP_DIR/src/pages/Todo.vue" "/opt/uptime-kuma/src/pages/" 2>/dev/null || true
+    sudo cp "$TEMP_DIR/src/pages/Backup.vue" "/opt/uptime-kuma/src/pages/" 2>/dev/null || true
+    sudo cp "$TEMP_DIR/src/pages/StatusPages.vue" "/opt/uptime-kuma/src/pages/" 2>/dev/null || true
     
     # Report componentlerini kopyala
     sudo mkdir -p "/opt/uptime-kuma/src/components/reports"
     sudo cp -r "$TEMP_DIR/src/components/reports/"* "/opt/uptime-kuma/src/components/reports/" 2>/dev/null || true
+    
+    # Login component'ini kopyala
+    sudo cp "$TEMP_DIR/src/components/Login.vue" "/opt/uptime-kuma/src/components/" 2>/dev/null || true
     
     # Utils dizinini oluştur ve reportUtils'i kopyala
     sudo mkdir -p "/opt/uptime-kuma/src/utils"
