@@ -1,7 +1,11 @@
+# brand.sh dosyasını güncelle
+cat > brand.sh << 'EOF'
 #!/bin/bash
 
-# BeyzTrack - Branding ve Özelleştirme Scripti
-# Bu script orijinal Uptime Kuma'yı BeyzTrack'e dönüştürür
+# BeyzTrack Branding Script'i
+# Uptime Kuma'yı BeyzTrack'e dönüştürür (Sadece Görsel Değişiklikler)
+# Setup ekranlarına dokunmaz!
+# Kullanım: curl -sSL https://raw.githubusercontent.com/Coosef/beyztrack/main/brand.sh | bash
 
 set -e
 
@@ -9,172 +13,133 @@ set -e
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
+BLUE='\033[1;34m'
 CYAN='\033[0;36m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
 # Logo
-echo -e "${BLUE}"
-echo "╔══════════════════════════════════════════════════════════════╗"
-echo "║                    BeyzTrack Branding                       ║"
-echo "║              Uptime Kuma → BeyzTrack Dönüşümü               ║"
-echo "╚══════════════════════════════════════════════════════════════╝"
-echo -e "${NC}"
+print_logo() {
+    echo -e "${BLUE}"
+    echo "  ____                    _______             "
+    echo " |  _ \                  |__   __|            "
+    echo " | |_) |_   _ _ __   __ _    | |_ __ __ _ _ __ "
+    echo " |  _ <| | | | '_ \ / _\` |   | | '__/ _\` | '__|"
+    echo " | |_) | |_| | | | | (_| |   | | | | (_| | |   "
+    echo " |____/ \__,_|_| |_|\__,_|   |_|_|  \__,_|_|   "
+    echo -e "${NC}"
+    echo -e "${GREEN} BeyzTrack - Sadece Görsel Branding${NC}"
+    echo ""
+}
 
-# Kurulum dizini
-INSTALL_DIR="/opt/uptime-kuma"
-BACKUP_DIR="/opt/uptime-kuma-backup-$(date +%Y%m%d-%H%M%S)"
-TEMP_DIR=""
+# Hata mesajı
+error() {
+    echo -e "${RED}❌ Hata: $1${NC}" >&2
+    exit 1
+}
 
-# Backup oluştur
-create_backup() {
-    echo -e "${CYAN}💾 Backup oluşturuluyor...${NC}"
-    
-    if [ -d "$INSTALL_DIR" ]; then
-        sudo cp -r "$INSTALL_DIR" "$BACKUP_DIR"
-        echo -e "${GREEN}✅ Backup oluşturuldu: $BACKUP_DIR${NC}"
-    else
-        echo -e "${RED}❌ Uptime Kuma kurulumu bulunamadı!${NC}"
-        echo -e "${YELLOW}   Önce orijinal kurulumu yapın:${NC}"
-        echo -e "${BLUE}   curl -sSL https://raw.githubusercontent.com/Coosef/beyztrack/main/install-original.sh | bash${NC}"
+# Başarı mesajı
+success() {
+    echo -e "${GREEN}✅ $1${NC}"
+}
+
+# Bilgi mesajı
+info() {
+    echo -e "${CYAN}ℹ️  $1${NC}"
+}
+
+# Uyarı mesajı
+warning() {
+    echo -e "${YELLOW}⚠️  $1${NC}"
+}
+
+# Uptime Kuma'nın kurulu olup olmadığını kontrol et
+check_uptime_kuma_installed() {
+    if [ ! -d "/opt/uptime-kuma" ] || [ ! -f "/opt/uptime-kuma/server/server.js" ]; then
+        error "Uptime Kuma '/opt/uptime-kuma' dizininde kurulu değil. Lütfen önce Uptime Kuma'yı kurun."
+        echo -e "${BLUE}   Önce Uptime Kuma'yı kurun, sonra bu script'i çalıştırın.${NC}"
         exit 1
     fi
 }
 
+# Backup oluştur
+create_backup() {
+    info " Backup oluşturuluyor..."
+    BACKUP_DIR="/opt/uptime-kuma-backup-$(date +%Y%m%d-%H%M%S)"
+    sudo cp -r "/opt/uptime-kuma" "$BACKUP_DIR" || error "Backup oluşturulamadı."
+    success "✅ Backup oluşturuldu: $BACKUP_DIR"
+}
+
 # BeyzTrack dosyalarını indir
 download_beyztrack() {
-    echo -e "${CYAN}📥 BeyzTrack dosyaları indiriliyor...${NC}"
+    info "📥 BeyzTrack dosyaları indiriliyor..."
     
     # Geçici dizin
     TEMP_DIR="/tmp/beyztrack-$(date +%s)"
     mkdir -p "$TEMP_DIR"
     
     # Repository'yi klonla
-    git clone https://github.com/Coosef/beyztrack.git "$TEMP_DIR"
+    git clone https://github.com/Coosef/beyztrack.git "$TEMP_DIR" || error "BeyzTrack repository klonlanamadı."
     
-    echo -e "${GREEN}✅ BeyzTrack dosyaları indirildi${NC}"
+    success "✅ BeyzTrack dosyaları indirildi"
 }
 
-# Frontend dosyalarını güncelle
-update_frontend() {
-    echo -e "${CYAN}🎨 Frontend dosyaları güncelleniyor...${NC}"
+# Sadece görsel dosyaları güncelle
+update_visual_files() {
+    info "🎨 Görsel dosyalar güncelleniyor..."
     
-    # Frontend dosyalarını kopyala
-    sudo cp -r "$TEMP_DIR/src"/* "$INSTALL_DIR/src/"
-    sudo cp -r "$TEMP_DIR/public"/* "$INSTALL_DIR/public/" 2>/dev/null || true
-    sudo cp "$TEMP_DIR/package.json" "$INSTALL_DIR/"
-    sudo cp "$TEMP_DIR/index.html" "$INSTALL_DIR/"
+    # Logo dosyalarını kopyala
+    sudo cp "$TEMP_DIR/public/1.png" "/opt/uptime-kuma/public/" 2>/dev/null || true
+    sudo cp "$TEMP_DIR/public/3.png" "/opt/uptime-kuma/public/" 2>/dev/null || true
+    sudo cp "$TEMP_DIR/public/3.svg" "/opt/uptime-kuma/public/" 2>/dev/null || true
     
-    # Vite config
-    sudo mkdir -p "$INSTALL_DIR/config"
-    sudo cp "$TEMP_DIR/config/vite.config.js" "$INSTALL_DIR/config/"
+    # Index.html'i güncelle (sadece title)
+    sudo sed -i 's/Uptime Kuma/BeyzTrack - Monitoring System/g' "/opt/uptime-kuma/index.html"
+    sudo sed -i 's/A fancy self-hosted monitoring tool/Monitoring \& Reporting System/g' "/opt/uptime-kuma/index.html"
     
-    # Ownership düzelt
-    sudo chown -R www-data:www-data "$INSTALL_DIR"
-    sudo chmod -R 755 "$INSTALL_DIR"
+    # Package.json'ı güncelle (sadece name ve description)
+    sudo sed -i 's/"name": "uptime-kuma"/"name": "beyztrack"/g' "/opt/uptime-kuma/package.json"
+    sudo sed -i 's/"description": "A fancy self-hosted monitoring tool"/"description": "BeyzTrack - Monitoring \& Reporting System"/g' "/opt/uptime-kuma/package.json"
     
-    echo -e "${GREEN}✅ Frontend dosyaları güncellendi${NC}"
+    success "✅ Görsel dosyalar güncellendi"
 }
 
-# Dependencies güncelle
-update_dependencies() {
-    echo -e "${CYAN}📦 Dependencies güncelleniyor...${NC}"
+# Layout.vue'yi güncelle (sadece logo ve isim)
+update_layout() {
+    info " Layout.vue güncelleniyor..."
     
-    cd "$INSTALL_DIR"
+    # Layout.vue'de sadece logo ve isim değişiklikleri
+    sudo sed -i 's|src="/icon.png"|src="/1.png"|g' "/opt/uptime-kuma/src/layouts/Layout.vue"
+    sudo sed -i 's/Uptime Kuma/BeyzTrack/g' "/opt/uptime-kuma/src/layouts/Layout.vue"
+    sudo sed -i 's/A fancy self-hosted monitoring tool/Monitoring \& Reporting System/g' "/opt/uptime-kuma/src/layouts/Layout.vue"
     
-    # Yeni dependencies kur
-    sudo npm install --legacy-peer-deps
-    
-    echo -e "${GREEN}✅ Dependencies güncellendi${NC}"
+    success "✅ Layout.vue güncellendi"
 }
 
-# Frontend rebuild
+# Frontend'i rebuild et
 rebuild_frontend() {
-    echo -e "${CYAN}🔨 Frontend yeniden build ediliyor...${NC}"
-    
-    cd "$INSTALL_DIR"
-    
-    # Frontend build
-    sudo npm run build
-    
-    # Dosya izinlerini düzelt
-    sudo chown -R www-data:www-data "$INSTALL_DIR/dist"
-    sudo chmod -R 755 "$INSTALL_DIR/dist"
-    
-    echo -e "${GREEN}✅ Frontend rebuild tamamlandı${NC}"
+    info "🔨 Frontend yeniden build ediliyor..."
+    cd "/opt/uptime-kuma" || error "Dizin değiştirilemedi: /opt/uptime-kuma"
+    sudo npm run build || error "Frontend rebuild başarısız."
+    success "✅ Frontend rebuild tamamlandı"
 }
 
-# Nginx konfigürasyonunu güncelle
-update_nginx() {
-    echo -e "${CYAN}⚙️  Nginx konfigürasyonu güncelleniyor...${NC}"
-    
-    # BeyzTrack için Nginx konfigürasyonu
-    sudo tee /etc/nginx/sites-available/uptime-kuma << 'EOF'
-server {
-    listen 80;
-    server_name _;
-    
-    # Frontend static files
-    location / {
-        root /opt/uptime-kuma/dist;
-        try_files $uri $uri/ /index.html;
-    }
-    
-    # Backend API proxy
-    location /api/ {
-        proxy_pass http://localhost:3001;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_cache_bypass $http_upgrade;
-    }
-    
-    # WebSocket proxy
-    location /socket.io/ {
-        proxy_pass http://localhost:3001;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "upgrade";
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-}
-EOF
-
-    # Nginx'i yeniden başlat
-    sudo nginx -t
-    sudo systemctl reload nginx
-    
-    echo -e "${GREEN}✅ Nginx konfigürasyonu güncellendi${NC}"
-}
-
-# PM2'yi yeniden başlat
-restart_pm2() {
-    echo -e "${CYAN}🔄 PM2 yeniden başlatılıyor...${NC}"
-    
-    # PM2'yi durdur ve başlat
-    sudo pm2 restart uptime-kuma
-    sudo pm2 save
-    
-    echo -e "${GREEN}✅ PM2 yeniden başlatıldı${NC}"
+# Servisi yeniden başlat
+restart_service() {
+    info " Servis yeniden başlatılıyor..."
+    sudo systemctl restart uptime-kuma || error "Servis yeniden başlatılamadı."
+    success "✅ Servis yeniden başlatıldı"
 }
 
 # Temizlik
 cleanup() {
-    echo -e "${CYAN}🧹 Temizlik yapılıyor...${NC}"
+    info " Temizlik yapılıyor..."
     
     # Geçici dosyaları temizle
     if [ -n "$TEMP_DIR" ] && [ -d "$TEMP_DIR" ]; then
         rm -rf "$TEMP_DIR"
     fi
     
-    echo -e "${GREEN}✅ Temizlik tamamlandı${NC}"
+    success "✅ Temizlik tamamlandı"
 }
 
 # Kurulum tamamlandı
@@ -183,35 +148,36 @@ branding_complete() {
     echo "╔══════════════════════════════════════════════════════════════╗"
     echo "║                  BRANDING TAMAMLANDI!                      ║"
     echo "╚══════════════════════════════════════════════════════════════╝"
-    echo -e "${NC}"
-    
-    echo -e "${CYAN}🌐 BeyzTrack Web Arayüz:${NC} http://$(hostname -I | awk '{print $1}')"
-    echo -e "${CYAN}🌐 BeyzTrack Web Arayüz:${NC} http://localhost"
-    echo -e "${CYAN}🔧 Backend:${NC} http://localhost:3001"
     echo ""
-    echo -e "${GREEN}✅ Uptime Kuma başarıyla BeyzTrack'e dönüştürüldü!${NC}"
-    echo -e "${YELLOW}📋 Yeni Özellikler:${NC}"
-    echo -e "${CYAN}   • BeyzTrack logosu ve branding${NC}"
-    echo -e "${CYAN}   • Gelişmiş raporlama sistemi${NC}"
-    echo -e "${CYAN}   • Canlı aktivite akışı${NC}"
-    echo -e "${CYAN}   • Backup menü entegrasyonu${NC}"
-    echo -e "${CYAN}   • Türkçe arayüz${NC}"
+    echo -e "${BLUE} BeyzTrack Web Arayüz: http://$(hostname -I | awk '{print $1}')${NC}"
+    echo -e "${BLUE} BeyzTrack Web Arayüz: http://localhost${NC}"
+    echo ""
+    echo -e "✅ Uptime Kuma başarıyla BeyzTrack'e dönüştürüldü!"
+    echo -e " Yapılan Değişiklikler:"
+    echo -e "${CYAN}   • Logo değiştirildi (/1.png)${NC}"
+    echo -e "${CYAN}   • İsim değiştirildi (BeyzTrack)${NC}"
+    echo -e "${CYAN}   • Tagline değiştirildi (Monitoring & Reporting System)${NC}"
+    echo -e "${CYAN}   • Package.json güncellendi${NC}"
+    echo -e "${CYAN}   • Index.html güncellendi${NC}"
+    echo -e "${CYAN}   • Setup ekranlarına dokunulmadı${NC}"
     echo ""
     echo -e "${BLUE}💾 Backup konumu: $BACKUP_DIR${NC}"
 }
 
 # Ana branding fonksiyonu
 main() {
+    print_logo
+    check_uptime_kuma_installed
     create_backup
     download_beyztrack
-    update_frontend
-    update_dependencies
+    update_visual_files
+    update_layout
     rebuild_frontend
-    update_nginx
-    restart_pm2
+    restart_service
     cleanup
     branding_complete
 }
 
 # Script'i çalıştır
 main "$@"
+EOF
