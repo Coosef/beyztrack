@@ -195,6 +195,19 @@ EOF
     success "✅ Nginx konfigürasyonu tamamlandı"
 }
 
+# UFW kurulumu
+install_ufw() {
+    info "📦 UFW kurulumu kontrol ediliyor..."
+    if command -v ufw &>/dev/null; then
+        success "✅ UFW zaten kurulu"
+    else
+        warning "⚠️  UFW kurulu değil. Kuruluyor..."
+        sudo apt-get update || error "Apt update başarısız."
+        sudo apt-get install -y ufw || error "UFW kurulumu başarısız."
+        success "✅ UFW kuruldu."
+    fi
+}
+
 # Firewall konfigürasyonu
 configure_firewall() {
     info "️  Firewall konfigürasyonu yapılıyor..."
@@ -219,6 +232,7 @@ main() {
     install_uptime_kuma
     create_systemd_service
     configure_nginx
+    install_ufw
     configure_firewall
 
     echo -e "${GREEN}"
