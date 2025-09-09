@@ -73,13 +73,41 @@ main() {
 apply_minimal_branding() {
     info "Minimal branding uygulanıyor..."
     
-    # Sadece logo değişikliği
-    echo "    🖼️ Logo güncelleniyor..."
+    # Logo dosyasını kopyala
+    echo "    🖼️ Logo dosyası kopyalanıyor..."
+    if [ -f "/opt/uptime-kuma/1.png" ]; then
+        echo "    ✅ Logo dosyası zaten var"
+    else
+        # Basit bir logo oluştur (SVG)
+        sudo tee "/opt/uptime-kuma/1.png" > /dev/null << 'EOF'
+<svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+  <rect width="40" height="40" fill="#4CAF50" rx="8"/>
+  <text x="20" y="28" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="white">B</text>
+</svg>
+EOF
+        echo "    ✅ Logo dosyası oluşturuldu"
+    fi
+    
+    # Logo değişikliği
+    echo "    🔄 Logo güncelleniyor..."
     sudo sed -i 's|src="/icon.png"|src="/1.png"|g' "/opt/uptime-kuma/src/layouts/Layout.vue"
     
-    # Sadece isim değişikliği
+    # İsim değişikliği
     echo "    📝 İsim güncelleniyor..."
     sudo sed -i 's/Uptime Kuma/BeyzTrack/g' "/opt/uptime-kuma/src/layouts/Layout.vue"
+    
+    # Değişiklikleri kontrol et
+    if grep -q "BeyzTrack" "/opt/uptime-kuma/src/layouts/Layout.vue"; then
+        echo "    ✅ İsim değişikliği başarılı"
+    else
+        echo "    ❌ İsim değişikliği başarısız"
+    fi
+    
+    if grep -q "/1.png" "/opt/uptime-kuma/src/layouts/Layout.vue"; then
+        echo "    ✅ Logo değişikliği başarılı"
+    else
+        echo "    ❌ Logo değişikliği başarısız"
+    fi
     
     success "Minimal branding uygulandı"
 }
