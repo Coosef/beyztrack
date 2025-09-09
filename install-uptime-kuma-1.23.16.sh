@@ -1,4 +1,4 @@
-# install-uptime-kuma-1.23.16.sh dosyasını oluştur
+# install-uptime-kuma-1.23.16.sh dosyasını düzelt
 cat > install-uptime-kuma-1.23.16.sh << 'EOF'
 #!/bin/bash
 
