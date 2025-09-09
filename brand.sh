@@ -158,6 +158,12 @@ add_beyztrack_features() {
     # Dil dosyalarını güncelle
     sudo cp "$TEMP_DIR/src/lang/tr-TR.json" "/opt/uptime-kuma/src/lang/" 2>/dev/null || true
     
+    # Eksik paketleri kur
+    echo "    📦 Eksik paketler kuruluyor..."
+    cd "/opt/uptime-kuma"
+    sudo npm install @vvo/tzdb vue-toastification --legacy-peer-deps 2>/dev/null || true
+    echo "    ✅ Eksik paketler kuruldu"
+    
     success "✅ BeyzTrack özellikleri eklendi"
 }
 
